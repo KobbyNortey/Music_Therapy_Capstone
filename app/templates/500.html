@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Internal Server Error{% endblock %}
+{% block content %}
+<div class="text-center error">
+    <h2>500 - Internal Server Error</h2>
+    <!-- <img src="{{ url_for('static', filename='images/500.png') }}" alt="500 error image" class="img-fluid"> -->
+    <p>Something went wrong on our end. Please try again later.</p>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+</div>
+{% endblock %}

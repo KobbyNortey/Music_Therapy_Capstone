@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h2>Dashboard</h2>
+{% if playlists %}
+    <ul class="list-group">
+        {% for playlist in playlists %}
+            <li class="list-group-item"><a href="{{ playlist.url }}">{{ playlist.name }}</a></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No playlists found.</p>
+{% endif %}
+<br>
+<a href="{{ url_for('create_playlist') }}" class="btn btn-primary">Create Playlist</a>
+{% endblock %}

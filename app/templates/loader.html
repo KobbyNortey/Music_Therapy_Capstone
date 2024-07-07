@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Playlist Being Curated{% endblock %}
+{% block content %}
+<h2>Playlist Being Curated</h2>
+<p>Please wait...</p>
+<div id="loader"></div>
+
+<script>
+    setTimeout(function() {
+        document.getElementById("loader").innerText = "Playlist created successfully!";
+        setTimeout(function() {
+            window.location.href = "{{ url_for('dashboard') }}";
+        }, 1000);
+    }, 4000);
+</script>
+{% endblock %}
