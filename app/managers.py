@@ -7,22 +7,34 @@ class PlaylistManager:
     def __init__(self, access_token):
         self.access_token = access_token
         self.spotify_api_base_url = 'https://api.spotify.com/v1/'
-        self.music_library = {
-            'relaxation': ['ambient', 'nature sounds', 'calm'],
-            'focus': ['concentration', 'focus music', 'study'],
-            'energy': ['energetic', 'upbeat', 'workout', 'rap']
+        self.mood_genre_mapping = {
+            'happy': ['pop', 'dance', 'funk', 'disco'],
+            'sad': ['blues', 'acoustic', 'classical', 'singer-songwriter'],
+            'energetic': ['rock', 'hip-hop', 'edm', 'metal'],
+            'calm': ['ambient', 'chill', 'acoustic', 'jazz'],
+            'romantic': ['r&b', 'soul', 'ballads', 'latin'],
+            'reflective': ['indie', 'folk', 'alternative', 'classical'],
+            'angry': ['punk', 'hard rock', 'metal', 'rap'],
+            'uplifted': ['reggae', 'ska', 'gospel', 'world music']
         }
 
-    def determine_therapy_type(self, mood, goal):
-        """Determines the therapy type based on user input."""
+    def determine_therapy_type(self, current_mood, goal_mood):
+        """Determines the ideal therapy genres based on user's current mood and desired state."""
+        # Map of ideal moods for therapy
+        ideal_mood_mapping = {
+            'tired': 'energetic',
+            'stressed': 'calm',
+            'sad': 'happy',
+            'angry': 'calm',
+            'bored': 'uplifted',
+            'anxious': 'relaxed'
+        }
 
-        if mood in ['tired', 'stressed', 'okay'] and goal in ['relaxation', 'focus', 'energy']:
-            if mood == 'tired' or goal == 'relaxation':
-                return 'relaxation'
-            elif mood == 'stressed' or goal == 'focus':
-                return 'focus'
-            elif mood == 'okay' or goal == 'energy':
-                return 'energy'
+        # Determine the ideal mood if the goal mood is not directly provided
+        ideal_mood = ideal_mood_mapping.get(current_mood.lower(), goal_mood.lower())
+
+        # Return the corresponding genres for the ideal mood
+        return self.mood_genre_mapping.get(ideal_mood, ['pop'])
 
     def create_playlist(self, user_id, name, description=None, public=False):
         headers = {'Authorization': f'Bearer {self.access_token}', 'Content-Type': 'application/json'}
@@ -54,21 +66,23 @@ class PlaylistManager:
             return tracks
         return []
 
-    def curate_playlist(self, user_id, mood, goal):
+    def curate_playlist(self, user_id, current_mood, goal_mood):
         """Creates a Spotify playlist for the specified therapy type."""
-        therapy_type = self.determine_therapy_type(mood, goal)
+        genres = self.determine_therapy_type(current_mood, goal_mood)
 
-        playlist_name = "Therapy - " + str(uuid4())[:8] + f" {therapy_type}"
+        playlist_name = "Therapy - " + str(uuid4())[:8] + f" {current_mood} to {goal_mood}"
         playlist = self.create_playlist(user_id, playlist_name)
 
-        search_keywords = self.music_library[therapy_type]
         track_uris = []
 
-        for keyword in search_keywords:
-            results = self.search_tracks(keyword)
+        for genre in genres:
+            results = self.search_tracks(f'genre:{genre}')
             if results:
                 track_uris += [item['uri'] for item in results]
 
         if track_uris:
-            self.add_songs_to_playlist(playlist['id'], track_uris[:30])  # Limit to 10 tracks
+            self.add_songs_to_playlist(playlist['id'], track_uris[:30])  # Limit to 30 tracks
         return playlist_name, playlist['external_urls']['spotify']
+
+
+

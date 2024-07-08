@@ -7,7 +7,6 @@
 
 <script>
     setTimeout(function() {
-        document.getElementById("loader").innerText = "Playlist created successfully!";
         setTimeout(function() {
             window.location.href = "{{ url_for('dashboard') }}";
         }, 1000);
